@@ -30,6 +30,9 @@ public class Producto {
     @Column(name = "stock", nullable = false)
     private Integer stock;
 
+    @Column(name = "imagenUrl", columnDefinition = "TEXT")
+    private String imagenUrl;
+
     @ManyToOne
     @JoinColumn(name = "idCategoria", nullable = false)
     private Categoria categoria;

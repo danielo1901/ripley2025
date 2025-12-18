@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-sm p-4">
+                    <h4 class="fw-bold mb-4"
+                        th:text="${categoria.idCategoria == null ? 'Nueva Categoría' : 'Editar Categoría'}"></h4>
+                    <form th:action="@{/categorias/guardar}" th:object="${categoria}" method="post">
+                        <input type="hidden" th:field="*{idCategoria}" />
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input type="text" th:field="*{nombre}" class="form-control" required />
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Descripción</label>
+                            <textarea th:field="*{descripcion}" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary px-5 rounded-pill shadow-sm">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

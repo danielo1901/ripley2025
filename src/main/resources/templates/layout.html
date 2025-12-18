@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+    th:fragment="layout(content)">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title}">Ripley 2025</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: 255, 0, 153;
+            /* Ripley Pink/Purple */
+            --secondary: 106, 0, 255;
+            --accent: 0, 212, 255;
+            --surface: #ffffff;
+            --background: #f0f2f5;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --sidebar-width: 280px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: calc(100vh - 2rem);
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            /* Slightly more opaque for performance */
+            backdrop-filter: blur(8px);
+            /* Reduced blur intensity */
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            color: white;
+            transition: var(--transition);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            /* Optimized shadow */
+            will-change: transform, opacity;
+            /* GPU acceleration hint */
+        }
+
+        .main-content {
+            margin-left: calc(var(--sidebar-width) + 2rem);
+            padding: 1rem;
+            transition: var(--transition);
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .main-content.no-sidebar {
+            margin-left: 0;
+            padding: 0;
+        }
+
+        /* Nav Links */
+        .nav-link {
+            color: rgba(255, 255, 255, 0.6);
+            padding: 0.9rem 1.5rem;
+            border-radius: 1rem;
+            margin: 0.25rem 1rem;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
+            margin-right: 1rem;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            color: white;
+            background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)));
+            box-shadow: 0 10px 15px -3px rgba(var(--primary), 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link.active i {
+            transform: scale(1.1);
+        }
+
+        /* Brand */
+        .brand-section {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .brand-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.6));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 1.25rem;
+            background: #ffffff;
+            /* Removed blur from all cards for performance */
+            box-shadow: 0 5px 15px -3px rgba(0, 0, 0, 0.05);
+            /* Lighter shadow */
+            transition: var(--transition);
+            will-change: transform, box-shadow;
+            /* GPU acceleration hint */
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                left: calc(-1 * var(--sidebar-width) - 2rem);
+            }
+
+            .sidebar.active {
+                left: 1rem;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, rgb(var(--primary)), rgb(var(--secondary)));
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(var(--primary), 0.2);
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(var(--primary), 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Client Styles */
+        .client-navbar {
+            background: rgba(255, 255, 255, 0.9);
+            /* Slightly more opaque */
+            backdrop-filter: blur(10px);
+            /* Reduced blur */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1rem 5%;
+            position: sticky;
+            top: 0;
+            z-index: 1050;
+        }
+
+        .hover-lift {
+            transition: var(--transition);
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar (Admin/Employee) -->
+    <nav sec:authorize="hasRole('ROLE_EMPLEADO')" class="sidebar shadow-lg" id="sidebar">
+        <div class="brand-section">
+            <div class="brand-logo">RIPLEY 2025</div>
+            <div class="small opacity-50 fw-bold text-uppercase tracking-wider">Management Suite</div>
+        </div>
+
+        <div class="nav flex-column mt-2 px-2 overflow-y-auto" style="flex: 1;">
+            <a th:href="@{/}" class="nav-link" th:classappend="${title == 'Dashboard - Ripley 2025' ? 'active' : ''}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <div class="px-4 py-2 small text-uppercase opacity-25 fw-bold mt-3" style="font-size: 0.7rem;">Inventario
+            </div>
+            <a th:href="@{/productos}" class="nav-link" th:classappend="${title.contains('Producto') ? 'active' : ''}">
+                <i class="bi bi-box-seam-fill"></i> Productos
+            </a>
+            <a th:href="@{/categorias}" class="nav-link"
+                th:classappend="${title.contains('Categoría') ? 'active' : ''}">
+                <i class="bi bi-tags-fill"></i> Categorías
+            </a>
+            <div class="px-4 py-2 small text-uppercase opacity-25 fw-bold mt-3" style="font-size: 0.7rem;">Operaciones
+            </div>
+            <a th:href="@{/proveedores}" class="nav-link"
+                th:classappend="${title.contains('Proveedor') ? 'active' : ''}">
+                <i class="bi bi-truck-front-fill"></i> Proveedores
+            </a>
+            <a th:href="@{/clientes}" class="nav-link" th:classappend="${title.contains('Cliente') ? 'active' : ''}">
+                <i class="bi bi-people-fill"></i> Clientes
+            </a>
+            <a th:href="@{/ventas}" class="nav-link" th:classappend="${title.contains('Venta') ? 'active' : ''}">
+                <i class="bi bi-receipt-cutoff"></i> Ventas
+            </a>
+            <div class="px-4 py-2 small text-uppercase opacity-25 fw-bold mt-3" style="font-size: 0.7rem;">Sistema</div>
+            <a th:href="@{/empleados}" class="nav-link" th:classappend="${title.contains('Empleado') ? 'active' : ''}">
+                <i class="bi bi-person-badge-fill"></i> Empleados
+            </a>
+        </div>
+
+        <div class="mt-auto p-4 border-top border-white border-opacity-10">
+            <form th:action="@{/logout}" method="post">
+                <button type="submit"
+                    class="btn btn-outline-light border-0 w-100 text-start nav-link p-0 m-0 opacity-75 hover-opacity-100">
+                    <i class="bi bi-box-arrow-left"></i> Cerrar Sesión
+                </button>
+            </form>
+        </div>
+    </nav>
+
+    <!-- Client/Guest Header -->
+    <nav sec:authorize="!hasRole('ROLE_EMPLEADO')"
+        class="client-navbar d-flex align-items-center justify-content-between shadow-sm">
+        <div class="d-flex align-items-center">
+            <div class="navbar-brand py-0 me-5"
+                style="padding:0 !important; font-size: 1.5rem !important; font-weight: 800; letter-spacing: -1px; color: var(--text-main);">
+                RIPLEY<span style="color: rgb(var(--primary));">STORE</span>
+            </div>
+            <div class="d-none d-md-flex">
+                <a th:href="@{/tienda}" class="client-nav-link mx-3 text-decoration-none fw-bold"
+                    th:style="${title.contains('Tienda') ? 'color: rgb(var(--primary))' : 'color: var(--text-muted)'}">Tienda</a>
+                <a sec:authorize="hasRole('ROLE_CLIENTE')" th:href="@{/tienda/mis-compras}"
+                    class="client-nav-link mx-3 text-decoration-none fw-bold"
+                    th:style="${title.contains('Compras') ? 'color: rgb(var(--primary))' : 'color: var(--text-muted)'}">Mis
+                    Compras</a>
+            </div>
+        </div>
+        <div class="d-flex align-items-center">
+            <!-- If Authenticated -->
+            <div sec:authorize="isAuthenticated()" class="d-flex align-items-center">
+                <div class="d-none d-sm-block me-3 text-end">
+                    <div class="small text-muted">Bienvenido</div>
+                    <div class="fw-bold" th:text="${#authentication.name}">Usuario</div>
+                </div>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                        <i class="bi bi-box-arrow-right me-2"></i>Salir
+                    </button>
+                </form>
+            </div>
+            <!-- If Guest -->
+            <div sec:authorize="isAnonymous()">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#loginModal"
+                    class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                    <i class="bi bi-person-circle me-2"></i>Entrar
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content wrapper -->
+    <main
+        th:class="${#authorization.expression('hasRole(''ROLE_EMPLEADO'')') ? 'main-content' : 'main-content no-sidebar'}">
+        <!-- Admin secondary nav -->
+        <nav sec:authorize="hasRole('ROLE_EMPLEADO')" class="navbar navbar-expand-lg navbar-light bg-transparent mb-4">
+            <div class="container-fluid">
+                <button type="button" id="sidebarCollapse" class="btn btn-white shadow-sm d-lg-none">
+                    <i class="bi bi-list"></i>
+                </button>
+                <h4 class="mb-0 ms-3" th:text="${title}">Dashboard</h4>
+            </div>
+        </nav>
+
+        <div th:replace="${content}"></div>
+    </main>
+
+    <!-- Login Modal -->
+    <div sec:authorize="isAnonymous()" class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 shadow">
+                <div class="modal-header border-0 pb-0">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5 pt-0">
+                    <div class="text-center mb-4">
+                        <div class="navbar-brand py-0 mb-2"
+                            style="padding:0 !important; font-size: 1.8rem !important; display: inline-block;">RIPLEY
+                            <span class="fw-light">2025</span>
+                        </div>
+                        <p class="text-muted">Inicia sesión para continuar tu compra</p>
+                    </div>
+
+                    <form th:action="@{/login}" method="post">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-muted">Nombre de usuario</label>
+                            <input type="text" name="username" class="form-control rounded-pill px-3" required
+                                placeholder="Tu usuario">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label small fw-bold text-muted">Contraseña</label>
+                            <input type="password" name="password" class="form-control rounded-pill px-3" required
+                                placeholder="********">
+                        </div>
+                        <button type="submit"
+                            class="btn btn-primary w-100 rounded-pill py-2 fw-bold shadow-sm">Ingresar</button>
+
+                        <div class="text-center mt-4">
+                            <span class="text-muted small">¿No tienes cuenta? </span>
+                            <a th:href="@{/registro}" class="text-primary small text-decoration-none fw-bold">Regístrate
+                                ahora</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('sidebarCollapse')?.addEventListener('click', function () {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+
+</html>

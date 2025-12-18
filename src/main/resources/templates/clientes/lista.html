@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold mb-0">Listado de Clientes</h2>
+            <a th:href="@{/clientes/nuevo}" class="btn btn-primary rounded-pill px-4">
+                <i class="bi bi-person-plus me-2"></i> Nuevo Cliente
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">DNI</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Username</th>
+                            <th class="text-end pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${clientes}">
+                            <td class="ps-4" th:text="${c.dni}">12345678</td>
+                            <td th:text="${c.nombre + ' ' + c.apellido}">Juan Perez</td>
+                            <td th:text="${c.email}">juan@mail.com</td>
+                            <td th:text="${c.username}">jperez</td>
+                            <td class="text-end pe-4">
+                                <a th:href="@{/clientes/editar/{id}(id=${c.idCliente})}"
+                                    class="btn btn-sm btn-outline-primary rounded-circle me-1">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:href="@{/clientes/eliminar/{id}(id=${c.idCliente})}"
+                                    class="btn btn-sm btn-outline-danger rounded-circle"
+                                    onclick="return confirm('¿Eliminar cliente?')">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

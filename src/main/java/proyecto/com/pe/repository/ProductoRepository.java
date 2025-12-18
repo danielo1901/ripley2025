@@ -1,5 +1,6 @@
 package proyecto.com.pe.repository;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -9,10 +10,16 @@ import java.util.List;
 
 public interface ProductoRepository extends JpaRepository<Producto, Integer> {
 
+    @Override
+    @EntityGraph(attributePaths = { "categoria", "proveedor" })
+    List<Producto> findAll();
+
     // Buscar por categoría
+    @EntityGraph(attributePaths = { "categoria", "proveedor" })
     List<Producto> findByCategoriaIdCategoria(Integer idCategoria);
 
     // Buscar por proveedor
+    @EntityGraph(attributePaths = { "categoria", "proveedor" })
     List<Producto> findByProveedorIdProveedor(Integer idProveedor);
 
     // Buscar por nombre (búsqueda parcial)

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+
+<body>
+    <section>
+        <!-- Hero Section -->
+        <div class="card border-0 rounded-4 mb-5 text-white overflow-hidden shadow"
+            style="background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1200&q=80') center/cover;">
+            <div class="card-body p-5 py-6">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-3">La mejor tecnología a tu alcance</h1>
+                    <p class="lead mb-4">Descubre nuestras ofertas exclusivas en Ripley 2025. Calidad garantizada en
+                        cada compra.</p>
+                    <a href="#productos"
+                        class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">Comprar ahora</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <div th:if="${param.success}"
+            class="alert alert-success alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                <div>
+                    <strong>¡Compra exitosa!</strong> Tu pedido ha sido procesado correctamente. Revisa "Mis Compras"
+                    para ver el detalle.
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${param.error}"
+            class="alert alert-danger alert-dismissible fade show rounded-4 shadow-sm border-0 mb-4" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+                <div th:text="${'Error: ' + param.error}">Error al procesar la compra.</div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Catalog Header -->
+        <div id="productos" class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold mb-0">Nuestro Catálogo</h2>
+                <p class="text-muted">Productos seleccionados para ti</p>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle rounded-pill" type="button"
+                    data-bs-toggle="dropdown">
+                    Filtrar por categoría
+                </button>
+                <ul class="dropdown-menu border-0 shadow">
+                    <li><a class="dropdown-item" href="#">Todas</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="row g-4">
+            <div th:each="p : ${productos}" class="col-12 col-md-4 col-lg-3">
+                <div class="card h-100 border-0 shadow-sm product-card hover-lift transition-all">
+                    <!-- Product Image -->
+                    <div class="position-relative">
+                        <div class="bg-light d-flex align-items-center justify-content-center overflow-hidden"
+                            style="height: 250px;">
+                            <img th:if="${p.imagenUrl != null and !#strings.isEmpty(p.imagenUrl)}"
+                                th:src="${p.imagenUrl}" class="img-fluid h-100 w-100 object-fit-cover"
+                                th:alt="${p.nombre}">
+                            <i th:unless="${p.imagenUrl != null and !#strings.isEmpty(p.imagenUrl)}"
+                                class="bi bi-laptop display-1 text-muted opacity-25"></i>
+                        </div>
+                        <div class="position-absolute top-0 end-0 p-3">
+                            <span class="badge bg-danger rounded-pill" th:if="${p.stock <= 5}">¡Últimas unidades!</span>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="text-muted small text-uppercase fw-bold tracking-wider"
+                                th:text="${p.categoria.nombre}">Cat</span>
+                            <div class="text-warning small">
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-fill"></i>
+                                <i class="bi bi-star-half"></i>
+                            </div>
+                        </div>
+                        <h5 class="card-title fw-bold mb-3 text-truncate" th:text="${p.nombre}">Nombre Producto</h5>
+
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div>
+                                <div class="small text-muted mb-0 opacity-50 text-uppercase fw-bold"
+                                    style="font-size: 0.6rem;">Precio Online</div>
+                                <div class="fs-4 fw-900 text-dark" style="letter-spacing: -1px;">
+                                    S/ <span th:text="${p.precio}">0.00</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="small text-muted mb-0 opacity-50 text-uppercase fw-bold"
+                                    style="font-size: 0.6rem;">Stock</div>
+                                <div class="fw-bold" th:classappend="${p.stock < 5 ? 'text-danger' : 'text-success'}"
+                                    th:text="${p.stock}">0</div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="mt-4 pt-3 border-top border-light">
+                            <!-- Client Role: Buy -->
+                            <div sec:authorize="hasRole('ROLE_CLIENTE')">
+                                <form th:action="@{/tienda/comprar/{id}(id=${p.idProducto})}" method="post">
+                                    <button type="submit"
+                                        class="btn btn-primary w-100 rounded-pill py-2 shadow-sm fw-bold">
+                                        <i class="bi bi-cart-plus me-2"></i>AÑADIR A BOLSA
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Guest Role: Login to Buy -->
+                            <div sec:authorize="!isAuthenticated()">
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#loginModal"
+                                    class="btn btn-dark w-100 rounded-pill py-2 shadow-sm fw-bold">
+                                    <i class="bi bi-bag-check me-2"></i>COMPRAR AHORA
+                                </button>
+                            </div>
+
+                            <!-- Employee Role: Management -->
+                            <div sec:authorize="hasRole('ROLE_EMPLEADO')">
+                                <a th:href="@{/productos/editar/{id}(id=${p.idProducto})}"
+                                    class="btn btn-outline-dark w-100 rounded-pill py-2 fw-bold">
+                                    <i class="bi bi-pencil-square me-2"></i>GESTIONAR
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${#lists.isEmpty(productos)}" class="col-12 text-center py-5">
+                <div class="bg-light rounded-circle d-inline-flex p-5 mb-4">
+                    <i class="bi bi-search display-1 text-muted"></i>
+                </div>
+                <h3 class="fw-bold">No hay productos disponibles</h3>
+                <p class="text-muted mx-auto" style="max-width: 400px;">Nuestro inventario se está actualizando. Por
+                    favor, vuelve a visitarnos en unos momentos.</p>
+                <a th:href="@{/tienda}" class="btn btn-primary rounded-pill px-5 mt-3">Refrescar</a>
+            </div>
+        </div>
+
+        <style>
+            .hover-lift:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 1rem 3rem rgba(0, 0, 0, .1) !important;
+            }
+
+            .transition-all {
+                transition: all 0.3s ease;
+            }
+
+            .line-clamp-2 {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .bg-soft-primary {
+                background-color: rgba(99, 102, 241, 0.1);
+            }
+
+            .py-6 {
+                padding-top: 5rem;
+                padding-bottom: 5rem;
+            }
+        </style>
+    </section>
+</body>
+
+</html>
